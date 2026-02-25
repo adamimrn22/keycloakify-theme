@@ -12,7 +12,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ children, className, ...prop
           p-6 sm:p-8  
           backdrop-blur
           shadow-xl
-          border border-border bg-card 
+          border border-border  
           ${className}
         `}
             {...props}

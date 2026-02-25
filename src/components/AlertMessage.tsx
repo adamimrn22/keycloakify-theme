@@ -7,7 +7,8 @@ export type AlertType = "success" | "error" | "warning" | "info";
 interface AlertMessageProps {
     type: AlertType;
     title?: string;
-    message: string;
+    message?: string;
+    children?: React.ReactNode;
     className?: string;
 }
 
@@ -37,14 +38,21 @@ const alertConfig = {
     }
 };
 
-export function AlertMessage({ type, title, message, className }: AlertMessageProps) {
+export function AlertMessage({
+    type,
+    title,
+    message,
+    children,
+    className
+}: AlertMessageProps) {
     const { icon: Icon, classes, defaultTitle } = alertConfig[type];
 
     return (
         <Alert className={cn(classes, className)}>
             <Icon className="h-4 w-4" />
             <AlertTitle>{title || defaultTitle}</AlertTitle>
-            <AlertDescription>{message}</AlertDescription>
+            {message && <AlertDescription>{message}</AlertDescription>}
+            {children}
         </Alert>
     );
 }

@@ -6,6 +6,8 @@ import TermsAndCondition from "@/components/terms/TermsAndCondition";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils"; // shadcn cn utility
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 export default function Terms(
     props: PageProps<Extract<KcContext, { pageId: "terms.ftl" }>, I18n>
@@ -62,7 +64,11 @@ export default function Terms(
         >
             {/* Scrollable Terms */}
             <div className="relative w-full max-w-3xl mx-auto">
-                <ScrollArea className="h-96 w-full  " onScroll={handleScroll}>
+                <ScrollArea
+                    className="h-96 w-full  "
+                    onScroll={handleScroll}
+                    scrollAreaPrimitiveClass="p-4"
+                >
                     <TermsAndCondition id="kc-terms-text" />
                 </ScrollArea>
 
@@ -82,33 +88,34 @@ export default function Terms(
                 method="post"
                 className="space-y-4 mt-3 max-w-3xl mx-auto"
             >
-                <label className="flex flex-col items-start space-y-1">
-                    <div className="flex items-center space-x-3 text-muted-foreground">
-                        <input
-                            type="checkbox"
+                <Label className="flex flex-col gap-2">
+                    <div className="flex items-start gap-3 text-muted-foreground">
+                        <Checkbox
                             checked={checked}
-                            onChange={e => {
-                                setChecked(e.target.checked);
-                                if (!scrolledToBottom && e.target.checked) {
+                            onCheckedChange={value => {
+                                const isChecked = value === true;
+                                setChecked(isChecked);
+
+                                if (!scrolledToBottom && isChecked) {
                                     setShowWarning(true);
                                 } else {
                                     setShowWarning(false);
                                 }
                             }}
-                            className="h-5 w-5"
                         />
-                        <span className="text-xs">
+
+                        <span className="text-xs leading-relaxed">
                             I confirm that I have thoroughly reviewed the Terms &
                             Conditions and Privacy Policy, and agree to abide by them.
                         </span>
                     </div>
 
                     {showWarning && (
-                        <div className="text-red-500 text-xs mt-1">
+                        <span className="text-xs text-destructive">
                             Please review the full document before accepting.
-                        </div>
+                        </span>
                     )}
-                </label>
+                </Label>
 
                 <Button
                     type="submit"

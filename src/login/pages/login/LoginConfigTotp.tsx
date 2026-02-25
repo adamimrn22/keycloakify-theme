@@ -1,24 +1,24 @@
-import React from "react";
+import { useState } from "react";
 import { PageProps } from "../../types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { ShieldCheck } from "lucide-react";
 import { kcSanitize } from "keycloakify/lib/kcSanitize";
 
 const LoginConfigTotp = (props: PageProps<"login-config-totp.ftl">) => {
     const { Template, kcContext, i18n } = props;
 
-    const { url, isAppInitiatedAction, totp, mode, messagesPerField } = kcContext;
+    const { url, isAppInitiatedAction, totp, messagesPerField } = kcContext;
 
-    const { msg, msgStr, advancedMsg } = i18n;
+    const { msg } = i18n;
+
+    const [otpValue, setOtpValue] = useState("");
+    const isDisabled = otpValue.trim().length !== 6;
 
     return (
         <Template i18n={i18n} kcContext={kcContext} displayMessage={false}>
-            {/* ROOT TEXT COLOR FIX */}
             <div className="space-y-4 text-foreground">
-                {/* HEADER */}
                 <div className="space-y-2 text-center">
                     <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">
                         Secure Your Account
@@ -29,7 +29,6 @@ const LoginConfigTotp = (props: PageProps<"login-config-totp.ftl">) => {
                     </p>
                 </div>
 
-                {/* STEP 1 */}
                 <div className="space-y-6">
                     <div className="space-y-1">
                         <h2 className="text-base font-medium text-foreground">
@@ -54,7 +53,6 @@ const LoginConfigTotp = (props: PageProps<"login-config-totp.ftl">) => {
                             </div>
                         </div>
 
-                        {/* Secret + Policy */}
                         <div className="flex-1 space-y-4 text-sm">
                             <div className="space-y-1">
                                 <p className="font-medium text-foreground">
@@ -70,7 +68,10 @@ const LoginConfigTotp = (props: PageProps<"login-config-totp.ftl">) => {
                                 {totp.totpSecretEncoded}
                             </div>
 
-                            {/* Policy */}
+                            <span className="text-xs text-muted-foreground">
+                                Use the following configuration values if the application
+                                allows setting them:
+                            </span>
                             <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-xs pt-3 text-muted-foreground">
                                 <span>{msg("loginTotpType")}</span>
                                 <span className="text-foreground">
@@ -107,7 +108,6 @@ const LoginConfigTotp = (props: PageProps<"login-config-totp.ftl">) => {
                     </div>
                 </div>
 
-                {/* STEP 2 */}
                 <div className="space-y-6">
                     <div className="space-y-1">
                         <h2 className="text-base font-medium text-foreground">
@@ -119,86 +119,100 @@ const LoginConfigTotp = (props: PageProps<"login-config-totp.ftl">) => {
                         </p>
                     </div>
 
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="totp" className="text-foreground">
-                                One-Time Code <span className="text-destructive">*</span>
-                            </Label>
+                    <form
+                        action={url.loginAction}
+                        id="kc-totp-settings-form"
+                        method="post"
+                    >
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="totp" className="text-foreground">
+                                    One-Time Code{" "}
+                                    <span className="text-destructive">*</span>
+                                </Label>
 
-                            <Input
-                                type="text"
-                                id="totp"
-                                name="totp"
-                                autoComplete="off"
-                                placeholder="EBC2131"
-                                maxLength={6}
-                                className="text-center text-lg tracking-[0.3em] font-medium"
-                                aria-invalid={messagesPerField.existsError("totp")}
-                            />
-
-                            {messagesPerField.existsError("totp") && (
-                                <span
-                                    id="input-error-otp-code"
-                                    className="text-destructive text-xs"
-                                    aria-live="polite"
-                                    dangerouslySetInnerHTML={{
-                                        __html: kcSanitize(messagesPerField.get("totp"))
+                                <Input
+                                    type="text"
+                                    id="totp"
+                                    name="totp"
+                                    autoComplete="off"
+                                    placeholder="123456"
+                                    maxLength={6}
+                                    value={otpValue}
+                                    onChange={e => {
+                                        const value = e.target.value.replace(/\D/g, "");
+                                        setOtpValue(value);
                                     }}
+                                    className="text-center text-lg tracking-[0.3em] font-medium"
+                                    aria-invalid={messagesPerField.existsError("totp")}
                                 />
-                            )}
+                                {messagesPerField.existsError("totp") && (
+                                    <span
+                                        id="input-error-otp-code"
+                                        className="text-destructive text-xs"
+                                        aria-live="polite"
+                                        dangerouslySetInnerHTML={{
+                                            __html: kcSanitize(
+                                                messagesPerField.get("totp")
+                                            )
+                                        }}
+                                    />
+                                )}
 
-                            <input
-                                type="hidden"
-                                id="totpSecret"
-                                name="totpSecret"
-                                value={totp.totpSecret}
-                            />
-                        </div>
+                                <input
+                                    type="hidden"
+                                    id="totpSecret"
+                                    name="totpSecret"
+                                    value={totp.totpSecret}
+                                />
+                            </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="userLabel" className="text-foreground">
-                                Device Name
-                            </Label>
+                            <div className="space-y-2">
+                                <Label htmlFor="userLabel" className="text-foreground">
+                                    Device Name
+                                </Label>
 
-                            <Input
-                                id="userLabel"
-                                name="userLabel"
-                                type="text"
-                                placeholder="e.g. MacBook Pro"
-                            />
-                        </div>
+                                <Input
+                                    id="userLabel"
+                                    name="userLabel"
+                                    type="text"
+                                    placeholder="e.g. MacBook Pro"
+                                />
+                            </div>
 
-                        {isAppInitiatedAction ? (
-                            <>
+                            {isAppInitiatedAction ? (
+                                <>
+                                    <Button
+                                        type="submit"
+                                        id="saveTOTPBtn"
+                                        disabled={isDisabled}
+                                        className="w-full text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Confirm & Enable
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        variant="ghost"
+                                        name="cancel-aia"
+                                        value="true"
+                                        id="cancelTOTPBtn"
+                                        className="w-full  text-sm font-medium"
+                                    >
+                                        Cancel
+                                    </Button>
+                                </>
+                            ) : (
                                 <Button
                                     type="submit"
                                     id="saveTOTPBtn"
-                                    className="w-full  text-sm font-medium"
+                                    disabled={isDisabled}
+                                    className="w-full text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     Confirm & Enable
                                 </Button>
-
-                                <Button
-                                    type="submit"
-                                    variant="ghost"
-                                    name="cancel-aia"
-                                    value="true"
-                                    id="cancelTOTPBtn"
-                                    className="w-full  text-sm font-medium"
-                                >
-                                    Cancel
-                                </Button>
-                            </>
-                        ) : (
-                            <Button
-                                type="submit"
-                                id="saveTOTPBtn"
-                                className="w-full  text-sm font-medium"
-                            >
-                                Confirm & Enable
-                            </Button>
-                        )}
-                    </div>
+                            )}
+                        </div>
+                    </form>
                 </div>
             </div>
         </Template>

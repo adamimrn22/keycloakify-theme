@@ -1,18 +1,26 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FormEmailInput } from "@/components/FormEmailInput";
 import { PageProps } from "../../types";
 import { FormPasswordInput } from "@/components/FormPasswordInput";
-import { Button } from "@base-ui/react";
-import { cn } from "@/lib/utils";
+
 import { AlertMessage } from "@/components/AlertMessage";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 const Login = (props: PageProps<"login.ftl">) => {
     const { i18n, Template, kcContext } = props;
     const [loading, setLoading] = useState(false);
 
-    const { url, login, realm, messagesPerField, message } = kcContext;
-    const { loginWithEmailAllowed, resetPasswordAllowed } = realm;
-    const { msgStr } = i18n;
+    const { url, login, realm, usernameHidden, messagesPerField, message } = kcContext;
+    const { loginWithEmailAllowed, resetPasswordAllowed, rememberMe } = realm;
+    const { msg, msgStr } = i18n;
+
+    const [username, setUsername] = useState(login?.username ?? "");
+    const [password, setPassword] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const isDisabled = !username.trim() || !password.trim() || isSubmitting;
 
     return (
         <Template i18n={i18n} kcContext={kcContext} displayMessage={false}>
@@ -43,10 +51,13 @@ const Login = (props: PageProps<"login.ftl">) => {
             )}
 
             <form
-                onSubmit={() => setLoading(true)}
                 id="kc-form-login"
                 action={url.loginAction}
                 method="post"
+                onSubmit={() => {
+                    setIsSubmitting(true);
+                    return true;
+                }}
             >
                 <FormEmailInput
                     name="username"
@@ -56,7 +67,8 @@ const Login = (props: PageProps<"login.ftl">) => {
                             : "Email Address"
                     }
                     placeholder="name@example.com"
-                    defaultValue={login?.username ?? ""}
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
                     error={messagesPerField.getFirstError("username")}
                 />
 
@@ -64,26 +76,49 @@ const Login = (props: PageProps<"login.ftl">) => {
                     name="password"
                     label="Password"
                     placeholder="Enter your password"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
                     error={messagesPerField.getFirstError("password")}
                 />
 
-                {resetPasswordAllowed && (
-                    <a
-                        href={url.loginResetCredentialsUrl}
-                        className="text-sm text-primary hover:underline mb-4 block text-end"
-                    >
-                        Forgot password?
-                    </a>
-                )}
+                <div className="flex items-center justify-between gap-4 mb-3">
+                    <div id="kc-form-options">
+                        {realm.rememberMe && !usernameHidden && (
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="rememberMe"
+                                    name="rememberMe"
+                                    tabIndex={5}
+                                    defaultChecked={!!login.rememberMe}
+                                />
+
+                                <Label
+                                    htmlFor="rememberMe"
+                                    className="text-xs font-medium leading-none text-muted-foreground cursor-pointer"
+                                >
+                                    {msg("rememberMe")}
+                                </Label>
+                            </div>
+                        )}
+                    </div>
+
+                    {resetPasswordAllowed && (
+                        <a
+                            href={url.loginResetCredentialsUrl}
+                            className="text-sm text-primary hover:underline transition-colors"
+                        >
+                            Forgot password?
+                        </a>
+                    )}
+                </div>
 
                 <Button
                     type="submit"
-                    className={cn(
-                        "w-full cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed bg-primary text-white hover:bg-primary/90 p-1 text-sm",
-                        loading && "disabled:cursor-wait"
-                    )}
+                    variant="default"
+                    disabled={isDisabled}
+                    className="w-full bg-primary text-white hover:bg-primary/90 p-1 text-sm mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {loading ? "Logging in..." : "Sign In"}
+                    {isSubmitting ? "Logging in..." : "Sign In"}
                 </Button>
             </form>
         </Template>

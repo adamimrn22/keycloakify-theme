@@ -4,9 +4,18 @@ import { cn } from "@/lib/utils";
 
 interface ScrollAreaProps extends ScrollAreaPrimitive.Root.Props {
     onScroll?: React.UIEventHandler<HTMLDivElement>;
+    scrollAreaPrimitiveClass?: string; // custom class for viewport
+    scrollBarClass?: string; // custom class for scrollbar
 }
 
-function ScrollArea({ className, children, onScroll, ...props }: ScrollAreaProps) {
+function ScrollArea({
+    className,
+    children,
+    onScroll,
+    scrollAreaPrimitiveClass,
+    scrollBarClass,
+    ...props
+}: ScrollAreaProps) {
     return (
         <ScrollAreaPrimitive.Root
             data-slot="scroll-area"
@@ -15,29 +24,36 @@ function ScrollArea({ className, children, onScroll, ...props }: ScrollAreaProps
         >
             <ScrollAreaPrimitive.Viewport
                 data-slot="scroll-area-viewport"
-                className="focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1 p-4"
-                onScroll={onScroll} // forward scroll event
+                className={cn(
+                    "focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1",
+                    scrollAreaPrimitiveClass
+                )}
+                onScroll={onScroll}
             >
                 {children}
             </ScrollAreaPrimitive.Viewport>
-            <ScrollBar />
+
+            <ScrollBar className={scrollBarClass} />
             <ScrollAreaPrimitive.Corner />
         </ScrollAreaPrimitive.Root>
     );
 }
 
-function ScrollBar({
-    className,
-    orientation = "vertical",
-    ...props
-}: ScrollAreaPrimitive.Scrollbar.Props) {
+interface ScrollBarProps extends ScrollAreaPrimitive.Scrollbar.Props {
+    className?: string;
+    orientation?: "vertical" | "horizontal";
+}
+
+function ScrollBar({ className, orientation = "vertical", ...props }: ScrollBarProps) {
     return (
         <ScrollAreaPrimitive.Scrollbar
             data-slot="scroll-area-scrollbar"
             data-orientation={orientation}
             orientation={orientation}
             className={cn(
-                "data-horizontal:h-2.5 data-horizontal:flex-col data-horizontal:border-t data-horizontal:border-t-transparent data-vertical:h-full data-vertical:w-2.5 data-vertical:border-l data-vertical:border-l-transparent flex touch-none p-px transition-colors select-none",
+                "data-horizontal:h-2.5 data-horizontal:flex-col data-horizontal:border-t data-horizontal:border-t-transparent " +
+                    "data-vertical:h-full data-vertical:w-2.5 data-vertical:border-l data-vertical:border-l-transparent " +
+                    "flex touch-none p-px transition-colors select-none",
                 className
             )}
             {...props}

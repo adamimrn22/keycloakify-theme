@@ -46,9 +46,7 @@ const Template = (props: CustomTemplateProps<any>) => {
 
             {/* Main AuthCard content */}
             <div className="relative z-10 flex min-h-dvh items-center justify-center px-4 py-10">
-                <AuthCard className={cn("gap-3 bg-card/90 backdrop-blur-sm shadow-xl border border-gray-300 ", isTotp ? "max-w-2xl" : "max-w-md")}>
-                    {children}
-                </AuthCard>
+                <AuthCard className={cn("gap-3 bg-card/90 backdrop-blur-sm shadow-md  ", isTotp ? "max-w-2xl" : "max-w-md")}>{children}</AuthCard>
             </div>
         </div>
     );

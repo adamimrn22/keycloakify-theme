@@ -4,6 +4,8 @@ import { AlertMessage } from "@/components/AlertMessage";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { FormPasswordInput } from "@/components/FormPasswordInput";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 const LoginUpdatePassword = (props: PageProps<"login-update-password.ftl">) => {
     const { i18n, Template, kcContext } = props;
@@ -11,6 +13,13 @@ const LoginUpdatePassword = (props: PageProps<"login-update-password.ftl">) => {
 
     const [loading, setLoading] = useState(false);
     const { msg } = i18n;
+
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const passwordsMatch = password === confirmPassword;
+    const isDisabled = !password || !confirmPassword || !passwordsMatch || isSubmitting;
 
     return (
         <Template i18n={i18n} kcContext={kcContext} displayMessage={false}>
@@ -34,13 +43,18 @@ const LoginUpdatePassword = (props: PageProps<"login-update-password.ftl">) => {
                 id="kc-passwd-update-form"
                 action={url.loginAction}
                 method="post"
-                onSubmit={() => setLoading(true)}
+                onSubmit={() => {
+                    setIsSubmitting(true);
+                    return true;
+                }}
             >
                 {/* New Password */}
                 <FormPasswordInput
                     name="password-new"
-                    label={"New Password"}
-                    placeholder={"Enter your new password"}
+                    label="New Password"
+                    placeholder="Enter your new password"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
                     error={messagesPerField.get("password-new")}
                 />
 
@@ -49,32 +63,34 @@ const LoginUpdatePassword = (props: PageProps<"login-update-password.ftl">) => {
                     name="password-confirm"
                     label="Confirm New Password"
                     placeholder="Confirm your new password"
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
                     error={messagesPerField.get("password-confirm")}
                 />
 
                 {/* Logout sessions */}
-                <div className="my-3">
-                    <label className="flex items-center space-x-2 text-xs text-muted-foreground">
-                        <input
-                            type="checkbox"
-                            id="logout-sessions"
-                            name="logout-sessions"
-                            value="on"
-                            defaultChecked
-                        />
-                        <span>{msg("logoutOtherSessions")}</span>
-                    </label>
+                <div className="my-3 flex items-center space-x-2">
+                    <Checkbox
+                        id="logout-sessions"
+                        name="logout-sessions"
+                        value="on"
+                        defaultChecked
+                    />
+
+                    <Label
+                        htmlFor="logout-sessions"
+                        className="text-xs text-muted-foreground cursor-pointer"
+                    >
+                        {msg("logoutOtherSessions")}
+                    </Label>
                 </div>
 
                 <Button
                     type="submit"
-                    disabled={loading}
-                    className={cn(
-                        "w-full bg-primary text-white hover:bg-primary/90 p-1 text-sm",
-                        loading && "cursor-wait"
-                    )}
+                    disabled={isDisabled}
+                    className="w-full bg-primary text-white hover:bg-primary/90 p-1 text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:cursor-wait"
                 >
-                    {loading ? "Resetting Password..." : msg("doSubmit")}
+                    {isSubmitting ? "Resetting Password..." : "Update Password"}
                 </Button>
             </form>
 

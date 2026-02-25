@@ -4,9 +4,7 @@ import type { KcContext } from "./KcContext";
 import { useI18n } from "./i18n";
 import DefaultPage from "keycloakify/login/DefaultPage";
 import { Template as CustomTemplate } from "./Template";
-const UserProfileFormFields = lazy(
-    () => import("keycloakify/login/UserProfileFormFields")
-);
+const UserProfileFormFields = lazy(() => import("./UserProfileFormFields"));
 
 import "../index.css";
 
@@ -28,7 +26,13 @@ export default function KcPage(props: { kcContext: KcContext }) {
             () => import("./pages/login/LoginUpdatePassword")
         ),
         "login-verify-email.ftl": lazy(() => import("./pages/login/LoginVerifyEmail")),
-        "login-config-totp.ftl": lazy(() => import("./pages/login/LoginConfigTotp"))
+        "login-config-totp.ftl": lazy(() => import("./pages/login/LoginConfigTotp")),
+        "login-otp.ftl": lazy(() => import("./pages/login/LoginOtp")),
+        "login-update-profile.ftl": lazy(
+            () => import("./pages/login/LoginUpdateProfile")
+        ),
+        "info.ftl": lazy(() => import("./pages/login/Info")),
+        "error.ftl": lazy(() => import("./pages/login/Error"))
     }[kcContext.pageId];
 
     return (
@@ -38,6 +42,9 @@ export default function KcPage(props: { kcContext: KcContext }) {
                     Template={CustomTemplate}
                     i18n={i18n}
                     kcContext={kcContext}
+                    doUseDefaultCss={false}
+                    UserProfileFormFields={UserProfileFormFields}
+                    doMakeUserConfirmPassword={doMakeUserConfirmPassword}
                 />
             ) : (
                 <DefaultPage
