@@ -10,20 +10,21 @@ const Login = (props: PageProps<"login.ftl">) => {
     const { i18n, Template, kcContext } = props;
     const [loading, setLoading] = useState(false);
 
-    // Destructure necessary objects from kcContext
     const { url, login, realm, messagesPerField, message } = kcContext;
-    const { loginWithEmailAllowed, resetPasswordAllowed, registrationAllowed } = realm;
+    const { loginWithEmailAllowed, resetPasswordAllowed } = realm;
     const { msgStr } = i18n;
 
     return (
         <Template i18n={i18n} kcContext={kcContext} displayMessage={false}>
-            <h1 className="text-2xl font-semibold">Sign in to your account</h1>
+            <h1 className="text-2xl font-semibold text-foreground">
+                Sign in to your account
+            </h1>
 
             <p className="text-sm text-muted-foreground mt-1  ">
                 Enter your credentials to access your test projects and reports.
             </p>
 
-            {message?.type === "success" && (
+            {message && message.type === "success" && (
                 <AlertMessage
                     type="success"
                     title="Login Successful"
@@ -32,7 +33,7 @@ const Login = (props: PageProps<"login.ftl">) => {
                 />
             )}
 
-            {message?.type === "error" && (
+            {message && message.type === "error" && (
                 <AlertMessage
                     type="error"
                     title="Login Failed"
@@ -52,7 +53,7 @@ const Login = (props: PageProps<"login.ftl">) => {
                     label={
                         loginWithEmailAllowed
                             ? msgStr("usernameOrEmail")
-                            : msgStr("email")
+                            : "Email Address"
                     }
                     placeholder="name@example.com"
                     defaultValue={login?.username ?? ""}
@@ -63,7 +64,6 @@ const Login = (props: PageProps<"login.ftl">) => {
                     name="password"
                     label="Password"
                     placeholder="Enter your password"
-                    // Display the actual Keycloak error text (e.g., "Invalid username or password.")
                     error={messagesPerField.getFirstError("password")}
                 />
 

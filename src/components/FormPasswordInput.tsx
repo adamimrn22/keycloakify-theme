@@ -24,9 +24,11 @@ export function FormPasswordInput({
     const [showPassword, setShowPassword] = useState(false);
 
     return (
-        <Field className="mb-4">
+        <Field className="my-2">
             <FieldGroup className="gap-2">
-                <FieldLabel htmlFor={name}>{label}</FieldLabel>
+                <FieldLabel className="text-foreground" htmlFor={name}>
+                    {label}
+                </FieldLabel>
                 <InputGroup>
                     <InputGroupAddon>
                         <IconWrapper icon={LockIcon} size="md" strokeWidth={2.5} />

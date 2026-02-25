@@ -3,15 +3,15 @@ import "../index.css";
 import { AuthCard } from "../components/AuthCard";
 
 import DarkModeToggle from "@/shared/DarkModeToggle";
+import { cn } from "@/lib/utils";
 
-const Template = (props: CustomTemplateProps<"login.ftl">) => {
+const Template = (props: CustomTemplateProps<any>) => {
     const { children, kcContext, i18n } = props;
-    // const { realm } = kcContext;
-    // const { internationalizationEnabled } = realm;
-    // const { enabledLanguages } = i18n;
+
+    const isTotp = kcContext.pageId === "login-config-totp.ftl";
 
     return (
-        <div className="relative w-screen h-screen overflow-hidden bg-background">
+        <div className="relative min-h-dvh w-full bg-background overflow-hidden">
             {/* Dark Mode Toggle positioned on top-right */}
             <div className="absolute top-4 right-4 z-20">
                 <DarkModeToggle />
@@ -45,8 +45,10 @@ const Template = (props: CustomTemplateProps<"login.ftl">) => {
             </div>
 
             {/* Main AuthCard content */}
-            <div className="relative z-10 flex justify-center items-center w-full h-full">
-                <AuthCard className="gap-3 bg-card/90 backdrop-blur-sm shadow-xl border">{children}</AuthCard>
+            <div className="relative z-10 flex min-h-dvh items-center justify-center px-4 py-10">
+                <AuthCard className={cn("gap-3 bg-card/90 backdrop-blur-sm shadow-xl border border-gray-300 ", isTotp ? "max-w-2xl" : "max-w-md")}>
+                    {children}
+                </AuthCard>
             </div>
         </div>
     );

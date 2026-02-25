@@ -2,7 +2,6 @@ import { Suspense, lazy } from "react";
 import type { ClassKey } from "keycloakify/login";
 import type { KcContext } from "./KcContext";
 import { useI18n } from "./i18n";
-import Template from "keycloakify/login/Template";
 import DefaultPage from "keycloakify/login/DefaultPage";
 import { Template as CustomTemplate } from "./Template";
 const UserProfileFormFields = lazy(
@@ -10,9 +9,6 @@ const UserProfileFormFields = lazy(
 );
 
 import "../index.css";
-import Login from "./pages/login/Login";
-import ResetPassword from "./pages/login/ResetPassword";
-import Terms from "./pages/login/Terms";
 
 const doMakeUserConfirmPassword = true;
 
@@ -22,9 +18,17 @@ export default function KcPage(props: { kcContext: KcContext }) {
     const { i18n } = useI18n({ kcContext });
 
     const PageComponent = {
-        "login.ftl": Login,
-        // "login-reset-password.ftl": ResetPassword,
-        "terms.ftl": Terms
+        "login.ftl": lazy(() => import("./pages/login/Login")),
+        "terms.ftl": lazy(() => import("./pages/login/Terms")),
+        "login-page-expired.ftl": lazy(() => import("./pages/login/LoginPageExpired")),
+        "login-reset-password.ftl": lazy(
+            () => import("./pages/login/LoginResetPassword")
+        ),
+        "login-update-password.ftl": lazy(
+            () => import("./pages/login/LoginUpdatePassword")
+        ),
+        "login-verify-email.ftl": lazy(() => import("./pages/login/LoginVerifyEmail")),
+        "login-config-totp.ftl": lazy(() => import("./pages/login/LoginConfigTotp"))
     }[kcContext.pageId];
 
     return (

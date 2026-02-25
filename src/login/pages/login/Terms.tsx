@@ -83,7 +83,7 @@ export default function Terms(
                 className="space-y-4 mt-3 max-w-3xl mx-auto"
             >
                 <label className="flex flex-col items-start space-y-1">
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-3 text-muted-foreground">
                         <input
                             type="checkbox"
                             checked={checked}
@@ -98,8 +98,8 @@ export default function Terms(
                             className="h-5 w-5"
                         />
                         <span className="text-xs">
-                            I confirm that I have thoroughly reviewed the Enterprise Terms
-                            & Conditions and Privacy Policy, and agree to abide by them.
+                            I confirm that I have thoroughly reviewed the Terms &
+                            Conditions and Privacy Policy, and agree to abide by them.
                         </span>
                     </div>
 

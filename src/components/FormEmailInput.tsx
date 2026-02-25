@@ -13,14 +13,25 @@ interface FormTextInputProps extends React.InputHTMLAttributes<HTMLInputElement>
     label: string;
     name: string;
     error?: string;
+    inputGroupClassName?: string;
 }
 
-export function FormEmailInput({ label, name, error, ...props }: FormTextInputProps) {
+export function FormEmailInput({
+    label,
+    name,
+    error,
+    inputGroupClassName,
+    ...props
+}: FormTextInputProps) {
     return (
-        <Field className="mb-4">
+        <Field className=" ">
             <FieldGroup className="gap-2">
-                <FieldLabel htmlFor={name}>{label}</FieldLabel>
-                <InputGroup className="mb-0">
+                <FieldLabel className="text-foreground" htmlFor={name}>
+                    {label}
+                </FieldLabel>
+                <InputGroup
+                    className={`${inputGroupClassName ?? "text-muted-foreground"}`}
+                >
                     <InputGroupAddon>
                         <IconWrapper icon={MailIcon} size="md" strokeWidth={2.5} />
                     </InputGroupAddon>
@@ -33,7 +44,9 @@ export function FormEmailInput({ label, name, error, ...props }: FormTextInputPr
                     />
                 </InputGroup>
                 {error && (
-                    <FieldError className="text-xs text-destructive">{error}</FieldError>
+                    <FieldError className="text-xs text-destructive mb-2">
+                        {error}
+                    </FieldError>
                 )}
             </FieldGroup>
         </Field>
